@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 0 — project skeleton**.
+Under active development. Currently at: **Stage 1 — local auth**.
 
 ## Tech Stack
 
@@ -45,8 +45,10 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 
 ## Roadmap
 
+## Roadmap
+
 - [x] Project skeleton, config, placeholder landing page
-- [ ] User model + local signup/login (student ungated; instructor/TA/admin gated)
+- [x] User model + local signup/login (student ungated; instructor/TA/admin gated, pending review)
 - [ ] Admin approval workflow + CLI bootstrap (`flask create-admin`)
 - [ ] Course/Section/Activity/Mark models + staff CRUD
 - [ ] Student enrollment
