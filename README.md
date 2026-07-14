@@ -32,9 +32,13 @@ kept out by design to stay a scoped personal project.
 
 \`\`\`bash
 python3 -m venv .venv
+
 source .venv/bin/activate
+
 pip install -r requirements.txt
+
 cp .env.example .env   # then set a real SECRET_KEY
+
 flask run
 \`\`\`
 
@@ -42,8 +46,6 @@ flask run
 
 See `app/` — application factory in `app/__init__.py`, blueprints per feature area
 (`auth`, `admin`, `main`, `courses`, `exports`), models in `app/models/`.
-
-## Roadmap
 
 ## Roadmap
 
