@@ -10,16 +10,25 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config_map[config_name])
 
-    # db.init_app(app)
-    # migrate.init_app(app, db)
-    # login_manager.init_app(app)
-    # bcrypt.init_app(app)
-    # csrf.init_app(app)
-    # oauth.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login_manager.init_app(app)
+    bcrypt.init_app(app)
+    csrf.init_app(app)
+    oauth.init_app(app)
 
-    # login_manager.login_view = "auth.login"
+    login_manager.login_view = "auth.login"
+
+    from app.models.user import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     from app.main import main_bp
     app.register_blueprint(main_bp)
+
+    from app.auth import auth_bp
+    app.register_blueprint(auth_bp)
 
     return app
