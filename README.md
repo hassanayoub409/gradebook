@@ -30,17 +30,37 @@ kept out by design to stay a scoped personal project.
 
 ## Local Setup
 
-\`\`\`bash
-python3 -m venv .venv
+1. Create a virtual environment:
 
-source .venv/bin/activate
+   ```bash
+   python3 -m venv .venv
+   ```
 
-pip install -r requirements.txt
+2. Activate the virtual environment:
 
-cp .env.example .env   # then set a real SECRET_KEY
+   ```bash
+   source .venv/bin/activate
+   ```
 
-flask run
-\`\`\`
+3. Install the project dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create your environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Open `.env` and set a secure `SECRET_KEY`.
+
+5. Run the application:
+
+   ```bash
+   flask run
+   ```
 
 ## Project Structure
 
