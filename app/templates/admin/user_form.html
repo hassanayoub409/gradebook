@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Add user — Gradebook{% endblock %}
+{% block content %}
+<main>
+    <h1>Add instructor / TA / admin</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.username.label }} {{ form.username() }}</p>
+        <p>{{ form.email.label }} {{ form.email() }}</p>
+        <p>{{ form.full_name.label }} {{ form.full_name() }}</p>
+        <p>{{ form.role.label }} {{ form.role() }}</p>
+        <p>{{ form.password.label }} {{ form.password() }} <small>{{ form.password.description }}</small></p>
+        <button type="submit">Create</button>
+    </form>
+</main>
+{% endblock %}

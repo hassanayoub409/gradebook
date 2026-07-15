@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Manage users — Gradebook{% endblock %}
+{% block content %}
+<main>
+    <h1>Instructor / TA / Admin accounts</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+    <p><a href="{{ url_for('admin.new_user') }}">+ Add user</a></p>
+    <table border="1" cellpadding="6">
+        <tr><th>Name</th><th>Email</th><th>Role</th><th>Reviewed by</th><th>Actions</th></tr>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.full_name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.role.value }}</td>
+            <td>{{ u.reviewer.username if u.reviewer else "—" }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('admin.remove_user', user_id=u.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No approved staff/admin accounts yet.</td></tr>
+        {% endfor %}
+    </table>
+</main>
+{% endblock %}
