@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if course else "New" }} course — Gradebook{% endblock %}
+{% block content %}
+<main>
+    <h1>{{ "Edit" if course else "New" }} course</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.code.label }} {{ form.code() }}</p>
+        <p>{{ form.title.label }} {{ form.title() }}</p>
+        <p>{{ form.term.label }} {{ form.term() }}</p>
+        <p>{{ form.is_published.label }} {{ form.is_published() }}</p>
+        <button type="submit">Save</button>
+    </form>
+</main>
+{% endblock %}

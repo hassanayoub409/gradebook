@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ course.code }} — Gradebook{% endblock %}
+{% block content %}
+<main>
+    <h1>{{ course.code }} — {{ course.title }}</h1>
+    <p>{{ course.term }} {{ "(unpublished)" if not course.is_published else "" }}</p>
+    {% if current_user.is_staff and course.has_staff(current_user) %}
+        <p><a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit course</a></p>
+    {% endif %}
+    <p>Sections, activities, and marks will appear here in a later build stage.</p>
+</main>
+{% endblock %}

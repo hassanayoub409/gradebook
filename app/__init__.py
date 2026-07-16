@@ -37,4 +37,7 @@ def create_app(config_name=None):
     from app.admin import admin_bp
     app.register_blueprint(admin_bp)
 
+    from app.courses import courses_bp
+    app.register_blueprint(courses_bp)
+
     return app
