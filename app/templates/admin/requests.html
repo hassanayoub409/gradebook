@@ -14,7 +14,7 @@
         <tr>
             <td>{{ u.full_name }}</td>
             <td>{{ u.email }}</td>
-            <td>{{ u.role.value }}</td>
+            <td>{{ u.role.value|capitalize }}</td>
             <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
             <td>
                 <form method="POST" action="{{ url_for('admin.approve_request', user_id=u.id) }}" style="display:inline;">
