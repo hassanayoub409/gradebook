@@ -4,9 +4,66 @@
 <main>
     <h1>{{ course.code }} — {{ course.title }}</h1>
     <p>{{ course.term }} {{ "(unpublished)" if not course.is_published else "" }}</p>
-    {% if current_user.is_staff and course.has_staff(current_user) %}
-        <p><a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit course</a></p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% set is_course_staff = current_user.is_staff and course.has_staff(current_user) %}
+
+    {% if is_course_staff %}
+        <p>
+            <a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit course</a>
+            &nbsp;|&nbsp;
+            <a href="{{ url_for('courses.new_section', course_id=course.id) }}">+ Add section</a>
+        </p>
+        {% set total_weight = course.sections | sum(attribute="weight") %}
+        <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>
     {% endif %}
-    <p>Sections, activities, and marks will appear here in a later build stage.</p>
+
+    {% for section in course.sections %}
+    <section style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+        <h2>{{ section.name }} — {{ section.weight }}%</h2>
+        {% if is_course_staff %}
+            <p>
+                <a href="{{ url_for('courses.edit_section', course_id=course.id, section_id=section.id) }}">Edit</a>
+                &nbsp;
+                <form method="POST" action="{{ url_for('courses.delete_section', course_id=course.id, section_id=section.id) }}" style="display:inline;" onsubmit="return confirm('Delete this section and all its activities?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Delete</button>
+                </form>
+                &nbsp;
+                <a href="{{ url_for('courses.new_activity', course_id=course.id, section_id=section.id) }}">+ Add activity</a>
+            </p>
+        {% endif %}
+
+        <table border="1" cellpadding="6">
+            <tr><th>Activity</th><th>Type</th><th>Total marks</th>{% if is_course_staff %}<th>Actions</th>{% endif %}</tr>
+            {% for activity in section.activities %}
+            <tr>
+                <td>{{ activity.name }}</td>
+                <td>{{ activity.activity_type.value }}</td>
+                <td>{{ activity.total_marks }}</td>
+                {% if is_course_staff %}
+                <td>
+                    <a href="{{ url_for('courses.edit_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}">Edit</a>
+                    &nbsp;
+                    <form method="POST" action="{{ url_for('courses.delete_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}" style="display:inline;" onsubmit="return confirm('Delete this activity?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% else %}
+            <tr><td colspan="{{ 4 if is_course_staff else 3 }}">No activities in this section yet.</td></tr>
+            {% endfor %}
+        </table>
+    </section>
+    {% else %}
+    <p>No sections yet.</p>
+    {% endfor %}
 </main>
 {% endblock %}

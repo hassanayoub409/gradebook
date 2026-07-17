@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 3 — course model + dashboards**.
+Under active development. Currently at: **Stage 4 — sections & activities**.
 
 ## Tech Stack
 
@@ -82,7 +82,7 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 - [x] User model + local signup/login (student ungated; instructor/TA/admin gated, pending review)
 - [x] Admin approval workflow + CLI bootstrap (`flask create-admin`)
 - [x] Course model + staff course creation + student/staff dashboards
-- [ ] Section/Activity models + staff CRUD
+- [x] Section/Activity models + staff CRUD
 - [ ] Mark model + manual entry + student totals
 - [ ] Student enrollment
 - [ ] Excel export
