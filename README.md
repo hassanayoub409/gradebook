@@ -34,6 +34,9 @@ kept out by design to stay a scoped personal project.
 such as email, username etc. are stored in the database for audit trail. This means the same username or email
 cannot be used for any future registrations.
 
+2. It is not enforced that section (quizzes, assignments, ...) weights add up to 100. It is left for instructors/TAs
+to make sure according to the logistics at hand.
+
 ## Local Setup
 
 1. Create a virtual environment:
