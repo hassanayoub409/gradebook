@@ -28,6 +28,12 @@ Under active development. Currently at: **Stage 3 — course model + dashboards*
 Grading rubrics, plagiarism detection, real-time chat, mobile app, multi-tenant institutions —
 kept out by design to stay a scoped personal project.
 
+## Known Limitations
+
+1. If a registrations request (for Instructor/Admin/TA account) is rejected, the details of registration
+such as email, username etc. are stored in the database for audit trail. This means the same username or email
+cannot be used for any future registrations.
+
 ## Local Setup
 
 1. Create a virtual environment:
