@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 4 — sections & activities**.
+Under active development. Currently at: **Stage 5 — marks & grading (pending enrollment for full test)**.
 
 ## Tech Stack
 
@@ -83,7 +83,7 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 - [x] Admin approval workflow + CLI bootstrap (`flask create-admin`)
 - [x] Course model + staff course creation + student/staff dashboards
 - [x] Section/Activity models + staff CRUD
-- [ ] Mark model + manual entry + student totals
+- [x] Mark model + manual entry + student totals
 - [ ] Student enrollment
 - [ ] Excel export
 - [ ] CSV mark import
