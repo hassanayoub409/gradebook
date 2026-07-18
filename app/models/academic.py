@@ -50,3 +50,25 @@ class Activity(db.Model):
 
     def __repr__(self):
         return f"<Activity {self.name} /{self.total_marks}>"
+    
+class Mark(db.Model):
+    __tablename__ = "marks"
+
+    id = db.Column(db.Integer, primary_key=True)
+    activity_id = db.Column(db.Integer, db.ForeignKey("activities.id"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    obtained_marks = db.Column(db.Float, nullable=False)
+    entered_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    entered_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    activity = db.relationship("Activity", backref=db.backref("marks", cascade="all, delete-orphan"))
+    student = db.relationship("User", foreign_keys=[student_id])
+    grader = db.relationship("User", foreign_keys=[entered_by])
+
+    __table_args__ = (
+        db.UniqueConstraint("activity_id", "student_id", name="uq_mark_per_student_activity"),
+    )
+
+    def __repr__(self):
+        return f"<Mark student={self.student_id} activity={self.activity_id} {self.obtained_marks}>"
