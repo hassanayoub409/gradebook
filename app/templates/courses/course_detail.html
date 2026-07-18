@@ -21,11 +21,26 @@
         </p>
         {% set total_weight = course.sections | sum(attribute="weight") %}
         <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>
+    {% elif student_view_data and student_view_data.overall %}
+        <p><strong>Your grade: {{ "%.1f"|format(student_view_data.overall.current_percentage) }}%</strong>
+        <small>(assuming zero on anything not yet graded)</small></p>
+    {% elif student_view_data %}
+        <p><small>No sections have been set up yet.</small></p>
     {% endif %}
 
     {% for section in course.sections %}
     <section style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
         <h2>{{ section.name }} — {{ section.weight }}%</h2>
+
+        {% if student_view_data %}
+            {% set summary = student_view_data.section_summaries.get(section.id) %}
+            {% if summary %}
+                <p><small>Section score: {{ summary.obtained }} / {{ summary.possible }} ({{ "%.1f"|format(summary.percentage) }}%)</small></p>
+            {% else %}
+                <p><small>Nothing graded in this section yet.</small></p>
+            {% endif %}
+        {% endif %}
+
         {% if is_course_staff %}
             <p>
                 <a href="{{ url_for('courses.edit_section', course_id=course.id, section_id=section.id) }}">Edit</a>
@@ -40,12 +55,20 @@
         {% endif %}
 
         <table border="1" cellpadding="6">
-            <tr><th>Activity</th><th>Type</th><th>Total marks</th>{% if is_course_staff %}<th>Actions</th>{% endif %}</tr>
+            <tr>
+                <th>Activity</th><th>Type</th><th>Total marks</th>
+                {% if student_view_data %}<th>Your marks</th>{% endif %}
+                {% if is_course_staff %}<th>Actions</th>{% endif %}
+            </tr>
             {% for activity in section.activities %}
             <tr>
                 <td>{{ activity.name }}</td>
                 <td>{{ activity.activity_type.value }}</td>
                 <td>{{ activity.total_marks }}</td>
+                {% if student_view_data %}
+                    {% set mark = student_view_data.activity_marks.get(activity.id) %}
+                    <td>{{ mark.obtained_marks if mark else "Not graded yet" }}</td>
+                {% endif %}
                 {% if is_course_staff %}
                 <td>
                     <a href="{{ url_for('courses.edit_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}">Edit</a>
@@ -54,11 +77,13 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit">Delete</button>
                     </form>
+                    &nbsp;
+                    <a href="{{ url_for('courses.enter_marks', course_id=course.id, activity_id=activity.id) }}">Enter marks</a>
                 </td>
                 {% endif %}
             </tr>
             {% else %}
-            <tr><td colspan="{{ 4 if is_course_staff else 3 }}">No activities in this section yet.</td></tr>
+            <tr><td colspan="6">No activities in this section yet.</td></tr>
             {% endfor %}
         </table>
     </section>

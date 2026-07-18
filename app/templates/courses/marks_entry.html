@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Enter marks — {{ activity.name }}{% endblock %}
+{% block content %}
+<main>
+    <h1>Enter marks — {{ activity.name }} ({{ course.code }})</h1>
+    <p>Total marks: {{ activity.total_marks }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% if not students %}
+        <p>No students enrolled in this course yet.</p>
+    {% else %}
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <table border="1" cellpadding="6">
+            <tr><th>Student</th><th>Obtained marks</th></tr>
+            {% for student in students %}
+            {% set existing = existing_marks.get(student.id) %}
+            <tr>
+                <td>{{ student.full_name }} ({{ student.email }})</td>
+                <td>
+                    <input type="text" name="mark_{{ student.id }}"
+                           value="{{ existing.obtained_marks if existing else '' }}"
+                           placeholder="leave blank to skip">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Save marks</button>
+    </form>
+    {% endif %}
+
+    <p><a href="{{ url_for('courses.course_detail', course_id=course.id) }}">Back to course</a></p>
+</main>
+{% endblock %}
