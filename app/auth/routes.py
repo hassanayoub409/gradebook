@@ -6,6 +6,8 @@ from app.auth.forms import SignupForm, LoginForm
 from app.extensions import db, bcrypt
 from app.models.user import User, RoleEnum, ApprovalStatusEnum
 
+from app.models.course import PendingEnrollment, Enrollment
+
 
 def _attempt_login(user, remember=False):
     """
@@ -46,12 +48,25 @@ def signup():
             role=role,
         )
 
-        if role == RoleEnum.STUDENT:
+        if user.role == RoleEnum.STUDENT:
             user.approval_status = None
             db.session.add(user)
+            db.session.flush()  # need user.id before converting pending enrollments
+
+            pending_rows = PendingEnrollment.query.filter_by(email=user.email).all()
+            converted = 0
+            for pending in pending_rows:
+                db.session.add(Enrollment(course_id=pending.course_id, student_id=user.id))
+                db.session.delete(pending)
+                converted += 1
+
             db.session.commit()
             login_user(user)
-            flash("Welcome! Your account is ready.", "success")
+
+            if converted:
+                flash(f"Welcome! You've been enrolled in {converted} course(s) waiting for you.", "success")
+            else:
+                flash("Welcome! Your account is ready.", "success")
             return redirect(url_for("main.landing"))
         else:
             user.approval_status = ApprovalStatusEnum.PENDING

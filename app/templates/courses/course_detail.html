@@ -18,6 +18,8 @@
             <a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit course</a>
             &nbsp;|&nbsp;
             <a href="{{ url_for('courses.new_section', course_id=course.id) }}">+ Add section</a>
+            &nbsp;|&nbsp;
+            <a href="{{ url_for('courses.enroll_students', course_id=course.id) }}">Enroll students</a>
         </p>
         {% set total_weight = course.sections | sum(attribute="weight") %}
         <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>

@@ -2,14 +2,15 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 
 from app.courses import courses_bp
-from app.courses.forms import CourseForm, SectionForm, ActivityForm
 from app.courses.permissions import staff_required, course_staff_required, enrolled_or_staff_required
 from app.extensions import db
-from app.models.course import Course, CourseStaff, Enrollment
 from app.models.academic import Section, Activity, ActivityTypeEnum, Mark
 from app.models.user import User
 from app.utils.validators import validate_obtained_marks
 from app.utils.grades import student_activity_mark, section_summary, course_total
+
+from app.courses.forms import CourseForm, SectionForm, ActivityForm, EnrollForm
+from app.models.course import Course, CourseStaff, Enrollment, PendingEnrollment
 
 
 @courses_bp.route("/courses/new", methods=["GET", "POST"])
@@ -284,3 +285,97 @@ def enter_marks(course_id, activity_id):
         students=students,
         existing_marks=existing_marks,
     )
+
+@courses_bp.route("/courses/<int:course_id>/enroll", methods=["GET", "POST"])
+@login_required
+@course_staff_required
+def enroll_students(course_id):
+    course = Course.query.get_or_404(course_id)
+    form = EnrollForm()
+
+    if form.validate_on_submit():
+        raw_lines = [line.strip() for line in form.emails.data.splitlines()]
+        emails = [e for e in raw_lines if e]
+
+        enrolled_count = 0
+        invited_count = 0
+        skipped = []
+
+        for email in emails:
+            existing_user = User.query.filter_by(email=email).first()
+
+            if existing_user:
+                if existing_user.role.value != "student":
+                    skipped.append(f"{email} (not a student account)")
+                    continue
+                already = Enrollment.query.filter_by(
+                    course_id=course.id, student_id=existing_user.id
+                ).first()
+                if already:
+                    skipped.append(f"{email} (already enrolled)")
+                    continue
+                db.session.add(Enrollment(course_id=course.id, student_id=existing_user.id))
+                enrolled_count += 1
+            else:
+                already_pending = PendingEnrollment.query.filter_by(
+                    course_id=course.id, email=email
+                ).first()
+                if already_pending:
+                    skipped.append(f"{email} (already invited)")
+                    continue
+                db.session.add(PendingEnrollment(course_id=course.id, email=email))
+                invited_count += 1
+
+        db.session.commit()
+
+        if enrolled_count:
+            flash(f"Enrolled {enrolled_count} student(s).", "success")
+        if invited_count:
+            flash(f"Invited {invited_count} email(s) not yet registered — they'll be "
+                  f"enrolled automatically once they sign up as a student.", "info")
+        if skipped:
+            flash("Skipped: " + "; ".join(skipped), "warning")
+
+        return redirect(url_for("courses.enroll_students", course_id=course.id))
+
+    enrollments = (
+        Enrollment.query.join(User, Enrollment.student_id == User.id)
+        .filter(Enrollment.course_id == course.id)
+        .order_by(User.full_name.asc())
+        .all()
+    )
+    pending = PendingEnrollment.query.filter_by(course_id=course.id).order_by(
+        PendingEnrollment.email.asc()
+    ).all()
+
+    return render_template(
+        "courses/enroll_students.html",
+        course=course,
+        form=form,
+        enrollments=enrollments,
+        pending=pending,
+    )
+
+
+@courses_bp.route("/courses/<int:course_id>/enrollments/<int:enrollment_id>/remove", methods=["POST"])
+@login_required
+@course_staff_required
+def remove_enrollment(course_id, enrollment_id):
+    course = Course.query.get_or_404(course_id)
+    enrollment = Enrollment.query.filter_by(id=enrollment_id, course_id=course.id).first_or_404()
+    db.session.delete(enrollment)  # marks stay, since Mark links to activity+student, not enrollment
+    db.session.commit()
+    flash("Student removed from course.", "info")
+    return redirect(url_for("courses.enroll_students", course_id=course.id))
+
+
+@courses_bp.route("/courses/<int:course_id>/pending-enrollments/<int:pending_id>/cancel", methods=["POST"])
+@login_required
+@course_staff_required
+def cancel_pending_enrollment(course_id, pending_id):
+    course = Course.query.get_or_404(course_id)
+    pending = PendingEnrollment.query.filter_by(id=pending_id, course_id=course.id).first_or_404()
+    db.session.delete(pending)
+    db.session.commit()
+    flash("Invitation cancelled.", "info")
+    return redirect(url_for("courses.enroll_students", course_id=course.id))

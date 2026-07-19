@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Enroll students — {{ course.code }}{% endblock %}
+{% block content %}
+<main>
+    <h1>Enroll students — {{ course.code }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.emails.label }}<br>
+           {{ form.emails(rows=6, cols=50) }}<br>
+           <small>{{ form.emails.description }}</small></p>
+        <button type="submit">Enroll / Invite</button>
+    </form>
+
+    <h2>Enrolled students ({{ enrollments|length }})</h2>
+    <table border="1" cellpadding="6">
+        <tr><th>Name</th><th>Email</th><th>Enrolled on</th><th>Actions</th></tr>
+        {% for e in enrollments %}
+        <tr>
+            <td>{{ e.student.full_name }}</td>
+            <td>{{ e.student.email }}</td>
+            <td>{{ e.enrolled_at.strftime("%Y-%m-%d") }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('courses.remove_enrollment', course_id=course.id, enrollment_id=e.id) }}" style="display:inline;" onsubmit="return confirm('Remove this student from the course?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No students enrolled yet.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Pending invitations ({{ pending|length }})</h2>
+    <table border="1" cellpadding="6">
+        <tr><th>Email</th><th>Invited on</th><th>Actions</th></tr>
+        {% for p in pending %}
+        <tr>
+            <td>{{ p.email }}</td>
+            <td>{{ p.invited_at.strftime("%Y-%m-%d") }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('courses.cancel_pending_enrollment', course_id=course.id, pending_id=p.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Cancel</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">No pending invitations.</td></tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="{{ url_for('courses.course_detail', course_id=course.id) }}">Back to course</a></p>
+</main>
+{% endblock %}

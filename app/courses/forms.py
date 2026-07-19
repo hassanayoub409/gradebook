@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, FloatField, SelectField
+from wtforms import StringField, BooleanField, FloatField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, NumberRange
 
 
@@ -33,4 +33,12 @@ class ActivityForm(FlaskForm):
     total_marks = FloatField(
         "Total marks",
         validators=[DataRequired(), NumberRange(min=0.01, message="Total marks must be greater than 0.")],
+    )
+
+class EnrollForm(FlaskForm):
+    emails = TextAreaField(
+        "Student emails",
+        validators=[DataRequired()],
+        description="One email per line. Unregistered emails will be invited "
+        "and enrolled automatically once that person signs up as a student.",
     )
