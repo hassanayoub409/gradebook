@@ -26,7 +26,8 @@ def dashboard():
         return render_template("dashboard/staff_dashboard.html", courses=courses)
 
     if current_user.is_admin:
-        return render_template("dashboard/staff_dashboard.html", courses=[])
+        return redirect(url_for("admin.requests_list"))
+        # return render_template("dashboard/staff_dashboard.html", courses=[])
 
     courses = (
         Course.query.join(Enrollment, Enrollment.course_id == Course.id)
