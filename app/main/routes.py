@@ -11,7 +11,6 @@ def landing():
         return redirect(url_for("main.dashboard"))
     return render_template("landing.html")
 
-
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
@@ -31,7 +30,7 @@ def dashboard():
 
     courses = (
         Course.query.join(Enrollment, Enrollment.course_id == Course.id)
-        .filter(Enrollment.student_id == current_user.id)
+        .filter(Enrollment.student_id == current_user.id, Course.is_published.is_(True))
         .all()
     )
     return render_template("dashboard/student_dashboard.html", courses=courses)
