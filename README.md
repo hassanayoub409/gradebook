@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 6 — enrollment (full grading flow now testable end-to-end)**.
+Under active development. Currently at: **Stage 7 — Excel export**.
 
 ## Tech Stack
 
@@ -85,7 +85,7 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 - [x] Section/Activity models + staff CRUD
 - [x] Mark model + manual entry + student totals
 - [x] Student enrollment
-- [ ] Excel export
+- [x] Excel export
 - [ ] CSV mark import
 - [ ] Google OAuth login
 - [ ] Tests (auth, permissions, exports)
