@@ -40,4 +40,7 @@ def create_app(config_name=None):
     from app.courses import courses_bp
     app.register_blueprint(courses_bp)
 
+    from app.exports import exports_bp
+    app.register_blueprint(exports_bp)
+
     return app

@@ -20,12 +20,15 @@
             <a href="{{ url_for('courses.new_section', course_id=course.id) }}">+ Add section</a>
             &nbsp;|&nbsp;
             <a href="{{ url_for('courses.enroll_students', course_id=course.id) }}">Enroll students</a>
+            &nbsp;|&nbsp;
+            <a href="{{ url_for('exports.export_roster', course_id=course.id) }}">Export roster (Excel)</a>
         </p>
         {% set total_weight = course.sections | sum(attribute="weight") %}
         <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>
     {% elif student_view_data and student_view_data.overall %}
         <p><strong>Your grade: {{ "%.1f"|format(student_view_data.overall.current_percentage) }}%</strong>
         <small>(assuming zero on anything not yet graded)</small></p>
+        <p><a href="{{ url_for('exports.export_course', course_id=course.id) }}">Export my results (Excel)</a></p>
     {% elif student_view_data %}
         <p><small>No sections have been set up yet.</small></p>
     {% endif %}
