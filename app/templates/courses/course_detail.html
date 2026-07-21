@@ -22,6 +22,8 @@
             <a href="{{ url_for('courses.enroll_students', course_id=course.id) }}">Enroll students</a>
             &nbsp;|&nbsp;
             <a href="{{ url_for('exports.export_roster', course_id=course.id) }}">Export roster (Excel)</a>
+            &nbsp;|&nbsp;
+            <a href="{{ url_for('courses.manage_staff', course_id=course.id) }}">Manage staff</a>
         </p>
         {% set total_weight = course.sections | sum(attribute="weight") %}
         <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>

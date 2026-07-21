@@ -9,7 +9,7 @@ from app.models.user import User
 from app.utils.validators import validate_obtained_marks
 from app.utils.grades import student_activity_mark, section_summary, course_total
 
-from app.courses.forms import CourseForm, SectionForm, ActivityForm, EnrollForm, MarksImportForm
+from app.courses.forms import CourseForm, SectionForm, ActivityForm, EnrollForm, MarksImportForm, AddCourseStaffForm
 from app.models.course import Course, CourseStaff, Enrollment, PendingEnrollment
 
 from app.utils.csv_import import parse_marks_csv
@@ -433,3 +433,56 @@ def import_marks(course_id, activity_id):
         return redirect(url_for("courses.enter_marks", course_id=course.id, activity_id=activity.id))
 
     return render_template("courses/import_marks.html", form=form, course=course, activity=activity)
+
+@courses_bp.route("/courses/<int:course_id>/staff", methods=["GET", "POST"])
+@login_required
+@course_staff_required
+def manage_staff(course_id):
+    course = Course.query.get_or_404(course_id)
+    form = AddCourseStaffForm()
+
+    if form.validate_on_submit():
+        email = form.email.data.strip().lower()
+        candidate = User.query.filter(db.func.lower(User.email) == email).first()
+
+        if candidate is None:
+            flash(f"No account found with email {email}.", "danger")
+        elif not candidate.is_staff:
+            flash(f"{email} is not an instructor or TA account.", "danger")
+        elif not candidate.is_approved:
+            flash(f"{email} has not been approved by an admin yet.", "danger")
+        elif course.has_staff(candidate):
+            flash(f"{candidate.full_name} is already staff on this course.", "warning")
+        else:
+            db.session.add(CourseStaff(course_id=course.id, user_id=candidate.id))
+            db.session.commit()
+            flash(f"Added {candidate.full_name} as staff on this course.", "success")
+
+        return redirect(url_for("courses.manage_staff", course_id=course.id))
+
+    staff_members = (
+        CourseStaff.query.join(User, CourseStaff.user_id == User.id)
+        .filter(CourseStaff.course_id == course.id)
+        .order_by(User.full_name.asc())
+        .all()
+    )
+
+    return render_template("courses/manage_staff.html", course=course, form=form, staff_members=staff_members)
+
+
+@courses_bp.route("/courses/<int:course_id>/staff/<int:staff_id>/remove", methods=["POST"])
+@login_required
+@course_staff_required
+def remove_course_staff(course_id, staff_id):
+    course = Course.query.get_or_404(course_id)
+    staff_row = CourseStaff.query.filter_by(id=staff_id, course_id=course.id).first_or_404()
+
+    remaining = CourseStaff.query.filter_by(course_id=course.id).count()
+    if remaining <= 1:
+        flash("Cannot remove the last remaining staff member on this course.", "danger")
+        return redirect(url_for("courses.manage_staff", course_id=course.id))
+
+    db.session.delete(staff_row)
+    db.session.commit()
+    flash("Staff member removed from this course.", "info")
+    return redirect(url_for("courses.manage_staff", course_id=course.id))

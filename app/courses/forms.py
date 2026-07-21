@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, FloatField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Length, NumberRange
+from wtforms.validators import DataRequired, Length, NumberRange, Email
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
@@ -49,4 +49,11 @@ class MarksImportForm(FlaskForm):
     csv_file = FileField(
         "CSV file",
         validators=[FileRequired(), FileAllowed(["csv"], "CSV files only.")],
+    )
+
+class AddCourseStaffForm(FlaskForm):
+    email = StringField(
+        "Instructor or TA email",
+        validators=[DataRequired(), Email(), Length(max=120)],
+        description="Must be an existing, approved instructor or TA account.",
     )
