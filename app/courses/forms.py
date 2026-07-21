@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, FloatField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, NumberRange
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
 class CourseForm(FlaskForm):
@@ -41,4 +42,11 @@ class EnrollForm(FlaskForm):
         validators=[DataRequired()],
         description="One email per line. Unregistered emails will be invited "
         "and enrolled automatically once that person signs up as a student.",
+    )
+
+
+class MarksImportForm(FlaskForm):
+    csv_file = FileField(
+        "CSV file",
+        validators=[FileRequired(), FileAllowed(["csv"], "CSV files only.")],
     )

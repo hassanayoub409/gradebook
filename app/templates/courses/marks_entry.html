@@ -4,6 +4,7 @@
 <main>
     <h1>Enter marks — {{ activity.name }} ({{ course.code }})</h1>
     <p>Total marks: {{ activity.total_marks }}</p>
+    <p><a href="{{ url_for('courses.import_marks', course_id=course.id, activity_id=activity.id) }}">Import from CSV instead</a></p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}

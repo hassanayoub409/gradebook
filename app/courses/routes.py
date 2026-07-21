@@ -9,8 +9,10 @@ from app.models.user import User
 from app.utils.validators import validate_obtained_marks
 from app.utils.grades import student_activity_mark, section_summary, course_total
 
-from app.courses.forms import CourseForm, SectionForm, ActivityForm, EnrollForm
+from app.courses.forms import CourseForm, SectionForm, ActivityForm, EnrollForm, MarksImportForm
 from app.models.course import Course, CourseStaff, Enrollment, PendingEnrollment
+
+from app.utils.csv_import import parse_marks_csv
 
 
 @courses_bp.route("/courses/new", methods=["GET", "POST"])
@@ -379,3 +381,55 @@ def cancel_pending_enrollment(course_id, pending_id):
     db.session.commit()
     flash("Invitation cancelled.", "info")
     return redirect(url_for("courses.enroll_students", course_id=course.id))
+
+
+@courses_bp.route("/courses/<int:course_id>/activities/<int:activity_id>/marks/import", methods=["GET", "POST"])
+@login_required
+@course_staff_required
+def import_marks(course_id, activity_id):
+    course = Course.query.get_or_404(course_id)
+    activity = (
+        Activity.query.join(Section)
+        .filter(Activity.id == activity_id, Section.course_id == course.id)
+        .first_or_404()
+    )
+
+    students = (
+        db.session.query(User)
+        .join(Enrollment, Enrollment.student_id == User.id)
+        .filter(Enrollment.course_id == course.id)
+        .all()
+    )
+    students_by_email = {s.email.lower(): s for s in students}
+
+    form = MarksImportForm()
+
+    if form.validate_on_submit():
+        rows, errors = parse_marks_csv(form.csv_file.data.stream, students_by_email, activity.total_marks)
+
+        if errors:
+            for e in errors[:20]:  # cap displayed errors so one bad file doesn't flood the page
+                flash(e, "danger")
+            if len(errors) > 20:
+                flash(f"...and {len(errors) - 20} more errors.", "danger")
+            return render_template("courses/import_marks.html", form=form, course=course, activity=activity)
+
+        existing_marks = {m.student_id: m for m in activity.marks}
+        for student, obtained in rows:
+            mark = existing_marks.get(student.id)
+            if mark:
+                mark.obtained_marks = obtained
+                mark.entered_by = current_user.id
+            else:
+                db.session.add(Mark(
+                    activity_id=activity.id,
+                    student_id=student.id,
+                    obtained_marks=obtained,
+                    entered_by=current_user.id,
+                ))
+
+        db.session.commit()
+        flash(f"Imported marks for {len(rows)} student(s).", "success")
+        return redirect(url_for("courses.enter_marks", course_id=course.id, activity_id=activity.id))
+
+    return render_template("courses/import_marks.html", form=form, course=course, activity=activity)

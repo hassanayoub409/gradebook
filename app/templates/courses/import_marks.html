@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Import marks — {{ activity.name }}{% endblock %}
+{% block content %}
+<main>
+    <h1>Import marks — {{ activity.name }} ({{ course.code }})</h1>
+    <p>Total marks: {{ activity.total_marks }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <p>CSV must have two columns: <code>email</code>, <code>obtained_marks</code>.
+       One row per enrolled student. Leave <code>obtained_marks</code> blank to skip a student.</p>
+
+    <pre>email,obtained_marks
+student1@example.com,18
+student2@example.com,15.5
+student3@example.com,</pre>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>{{ form.csv_file.label }} {{ form.csv_file() }}</p>
+        <button type="submit">Import</button>
+    </form>
+
+    <p><a href="{{ url_for('courses.enter_marks', course_id=course.id, activity_id=activity.id) }}">Back to manual entry</a></p>
+</main>
+{% endblock %}
