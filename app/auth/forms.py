@@ -27,3 +27,16 @@ class SignupForm(FlaskForm):
 class LoginForm(FlaskForm):
     identifier = StringField("Username or email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
+
+class CompleteProfileForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=3, max=64)])
+    role = SelectField(
+        "I am a...",
+        choices=[
+            ("student", "Student"),
+            ("instructor", "Instructor"),
+            ("ta", "TA"),
+            ("admin", "Admin"),
+        ],
+        validators=[DataRequired()],
+    )

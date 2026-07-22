@@ -19,6 +19,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REMEMBER_COOKIE_DURATION = 60 * 60 * 24 * 7  # 7 days, not "forever"
 
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+
 
 class DevConfig(Config):
     DEBUG = True
