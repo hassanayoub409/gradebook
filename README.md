@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 8 — CSV import**.
+Under active development. Currently at: **Stage 9 — Google OAuth**.
 
 ## Tech Stack
 
@@ -63,13 +63,16 @@ to make sure according to the logistics at hand.
    cp .env.example .env
    ```
 
-   Open `.env` and set a secure `SECRET_KEY`.
+   Open `.env` and set `SECRET_KEY`, `GOOGLE_CLIENT_ID/SECRET`.
 
 5. Run the application:
 
    ```bash
    flask run
    ```
+
+Google OAuth requires a project in Google Cloud Console with an OAuth client (Web application),
+redirect URI `http://localhost:5000/login/google/callback` for local dev.
 
 ## Project Structure
 
@@ -87,6 +90,6 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 - [x] Student enrollment
 - [x] Excel export
 - [x] CSV mark import
-- [ ] Google OAuth login
+- [x] Google OAuth login
 - [ ] Tests (auth, permissions, exports)
 - [ ] Deployment
