@@ -1,1 +1,16 @@
 /* Theme variables and base styles land in the frontend polish stage (§9). */
+/* Bootstrap handles almost everything. Only true overrides/additions go here. */
+
+.navbar-brand {
+    letter-spacing: -0.02em;
+}
+
+/* Empty-state boxes, since Bootstrap has no built-in equivalent */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    border: 1px dashed #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+}
