@@ -1,32 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Manage users — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>Instructor / TA / Admin accounts</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <p><a href="{{ url_for('admin.new_user') }}">+ Add user</a></p>
-    <table border="1" cellpadding="6">
-        <tr><th>Name</th><th>Email</th><th>Role</th><th>Reviewed by</th><th>Actions</th></tr>
-        {% for u in users %}
-        <tr>
-            <td>{{ u.full_name }}</td>
-            <td>{{ u.email }}</td>
-            <td>{{ u.role.value }}</td>
-            <td>{{ u.reviewer.username if u.reviewer else "—" }}</td>
-            <td>
-                <form method="POST" action="{{ url_for('admin.remove_user', user_id=u.id) }}" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit">Remove</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="5">No approved staff/admin accounts yet.</td></tr>
-        {% endfor %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h4 mb-1">Instructor / TA / Admin accounts</h1>
+        <a href="{{ url_for('admin.requests_list') }}" class="small">← Back to pending requests</a>
+    </div>
+    <a href="{{ url_for('admin.new_user') }}" class="btn btn-primary btn-sm">+ Add user</a>
+</div>
+
+{% if users %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Reviewed by</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>{{ u.full_name }}</td>
+                <td>{{ u.email }}</td>
+                <td><span class="badge text-bg-secondary">{{ u.role.value }}</span></td>
+                <td>{{ u.reviewer.username if u.reviewer else "—" }}</td>
+                <td class="text-end">
+                    <form method="POST" action="{{ url_for('admin.remove_user', user_id=u.id) }}" class="d-inline" onsubmit="return confirm('Remove this account?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</main>
+</div>
+{% else %}
+<div class="empty-state">No approved staff/admin accounts yet.</div>
+{% endif %}
 {% endblock %}

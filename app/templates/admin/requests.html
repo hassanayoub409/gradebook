@@ -1,35 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Pending requests — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>Pending requests</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <table border="1" cellpadding="6">
-        <tr><th>Name</th><th>Email</th><th>Role</th><th>Signed up</th><th>Actions</th></tr>
-        {% for u in pending %}
-        <tr>
-            <td>{{ u.full_name }}</td>
-            <td>{{ u.email }}</td>
-            <td>{{ u.role.value|capitalize }}</td>
-            <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
-            <td>
-                <form method="POST" action="{{ url_for('admin.approve_request', user_id=u.id) }}" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit">Approve</button>
-                </form>
-                <form method="POST" action="{{ url_for('admin.reject_request', user_id=u.id) }}" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit">Reject</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="5">No pending requests.</td></tr>
-        {% endfor %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">Pending requests</h1>
+    <a href="{{ url_for('admin.users_list') }}" class="btn btn-outline-secondary btn-sm">Manage approved users →</a>
+</div>
+
+{% if pending %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Signed up</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in pending %}
+            <tr>
+                <td>{{ u.full_name }}</td>
+                <td>{{ u.email }}</td>
+                <td><span class="badge text-bg-secondary">{{ u.role.value }}</span></td>
+                <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
+                <td class="text-end">
+                    <form method="POST" action="{{ url_for('admin.approve_request', user_id=u.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.reject_request', user_id=u.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</main>
+</div>
+{% else %}
+<div class="empty-state">No pending requests.</div>
+{% endif %}
 {% endblock %}
