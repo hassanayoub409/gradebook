@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 9 — Google OAuth**.
+Under active development. Currently at: **Stage 10 — polish pass (Bootstrap styling, seed script) complete**.
 
 ## Tech Stack
 
@@ -41,38 +41,65 @@ to make sure according to the logistics at hand.
 
 1. Create a virtual environment:
 
-   ```bash
+```bash
    python3 -m venv .venv
-   ```
+```
 
 2. Activate the virtual environment:
 
-   ```bash
+```bash
    source .venv/bin/activate
-   ```
+```
 
 3. Install the project dependencies:
 
-   ```bash
+```bash
    pip install -r requirements.txt
-   ```
+```
 
 4. Create your environment file:
 
-   ```bash
+```bash
    cp .env.example .env
-   ```
+```
 
-   Open `.env` and set `SECRET_KEY`, `GOOGLE_CLIENT_ID/SECRET`.
+   Open `.env` and set `SECRET_KEY`, `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`.
 
-5. Run the application:
+5. Set up the database:
 
-   ```bash
+```bash
+   flask db upgrade
+```
+
+6. Create your first account. Either:
+
+   - **A single admin account**, to start from a clean slate:
+
+```bash
+     flask create-admin
+```
+
+   - **Or a full demo dataset** (admin, instructors, TAs, students, two courses with marks,
+     and pending requests) — useful for quickly exploring the app:
+
+```bash
+     flask seed-demo
+```
+
+7. Run the application:
+
+```bash
    flask run
-   ```
+```
 
 Google OAuth requires a project in Google Cloud Console with an OAuth client (Web application),
 redirect URI `http://localhost:5000/login/google/callback` for local dev.
+
+## Demo Data
+
+Run `flask seed-demo` to populate the database with a realistic demo dataset (2 courses,
+staff, students, marks, and pending requests). All demo accounts use password `password123`.
+See the command's output for the full account list.
 
 ## Project Structure
 
