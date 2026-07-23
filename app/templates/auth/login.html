@@ -1,20 +1,30 @@
 {% extends "base.html" %}
 {% block title %}Log in — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>Log in</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>{{ form.identifier.label }} {{ form.identifier() }}</p>
-        <p>{{ form.password.label }} {{ form.password() }}</p>
-        <button type="submit">Log in</button>
-    </form>
-    <p><a href="{{ url_for('auth.login_google') }}">Log in with Google</a></p>
-    <p>No account? <a href="{{ url_for('auth.signup') }}">Sign up</a></p>
-</main>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4">Log in</h1>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.identifier.label(class="form-label") }}
+                        {{ form.identifier(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Log in</button>
+                </form>
+                <hr>
+                <a href="{{ url_for('auth.login_google') }}" class="btn btn-outline-secondary w-100">Log in with Google</a>
+                <p class="text-center mt-3 mb-0">
+                    No account? <a href="{{ url_for('auth.signup') }}">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

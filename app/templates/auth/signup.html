@@ -1,25 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Sign up — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>Sign up</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>{{ form.username.label }} {{ form.username() }}</p>
-        <p>{{ form.email.label }} {{ form.email() }}</p>
-        <p>{{ form.full_name.label }} {{ form.full_name() }}</p>
-        <p>{{ form.password.label }} {{ form.password() }}</p>
-        <p>{{ form.confirm_password.label }} {{ form.confirm_password() }}</p>
-        <p>{{ form.role.label }} {{ form.role() }}</p>
-        <p><small>Instructor, TA, and Admin signups require admin review before you can log in.</small></p>
-        <button type="submit">Sign up</button>
-    </form>
-    <p><a href="{{ url_for('auth.login_google') }}">Sign up with Google</a></p>
-    <p>Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
-</main>
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4">Sign up</h1>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.full_name.label(class="form-label") }}
+                        {{ form.full_name(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.role.label(class="form-label") }}
+                        {{ form.role(class="form-select") }}
+                        <div class="form-text">Instructor, TA, and Admin signups require admin review before you can log in.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Sign up</button>
+                </form>
+                <hr>
+                <a href="{{ url_for('auth.login_google') }}" class="btn btn-outline-secondary w-100">Sign up with Google</a>
+                <p class="text-center mt-3 mb-0">
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

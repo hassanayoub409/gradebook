@@ -1,20 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Complete your profile — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>Complete your profile</h1>
-    <p>Signed in with Google as <strong>{{ email }}</strong>. Choose a username and role to finish setting up your account.</p>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>{{ form.username.label }} {{ form.username() }}</p>
-        <p>{{ form.role.label }} {{ form.role() }}</p>
-        <p><small>Instructor, TA, and Admin signups require admin review before you can log in.</small></p>
-        <button type="submit">Finish</button>
-    </form>
-</main>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-2">Complete your profile</h1>
+                <p class="text-muted small mb-4">Signed in with Google as <strong>{{ email }}</strong>. Choose a username and role to finish setting up your account.</p>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.role.label(class="form-label") }}
+                        {{ form.role(class="form-select") }}
+                        <div class="form-text">Instructor, TA, and Admin signups require admin review before you can log in.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Finish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
