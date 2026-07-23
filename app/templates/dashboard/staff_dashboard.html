@@ -1,17 +1,34 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>My courses</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">My courses</h1>
     {% if current_user.is_staff %}
-        <p><a href="{{ url_for('courses.new_course') }}">+ New course</a></p>
+        <a href="{{ url_for('courses.new_course') }}" class="btn btn-primary btn-sm">+ New course</a>
     {% endif %}
-    <ul>
-        {% for c in courses %}
-        <li><a href="{{ url_for('courses.course_detail', course_id=c.id) }}">{{ c.code }} — {{ c.title }} ({{ c.term }})</a></li>
-        {% else %}
-        <li>No courses yet.</li>
-        {% endfor %}
-    </ul>
-</main>
+</div>
+
+{% if courses %}
+<div class="row g-3">
+    {% for c in courses %}
+    <div class="col-md-6 col-lg-4">
+        <a href="{{ url_for('courses.course_detail', course_id=c.id) }}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 mb-1">{{ c.code }} — {{ c.title }}</h2>
+                    <p class="text-muted small mb-2">{{ c.term }}</p>
+                    {% if not c.is_published %}
+                        <span class="badge text-bg-warning">Unpublished — hidden from students</span>
+                    {% else %}
+                        <span class="badge text-bg-success">Published</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No courses yet.</div>
+{% endif %}
 {% endblock %}

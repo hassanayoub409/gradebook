@@ -1,17 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>My courses</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">My courses</h1>
     {% if courses %}
-        <p><a href="{{ url_for('exports.export_all') }}">Export all results (Excel)</a></p>
+        <a href="{{ url_for('exports.export_all') }}" class="btn btn-outline-primary btn-sm">Export all results (Excel)</a>
     {% endif %}
-    <ul>
-        {% for c in courses %}
-        <li><a href="{{ url_for('courses.course_detail', course_id=c.id) }}">{{ c.code }} — {{ c.title }} ({{ c.term }})</a></li>
-        {% else %}
-        <li>You're not enrolled in any courses yet.</li>
-        {% endfor %}
-    </ul>
-</main>
+</div>
+
+{% if courses %}
+<div class="row g-3">
+    {% for c in courses %}
+    <div class="col-md-6 col-lg-4">
+        <a href="{{ url_for('courses.course_detail', course_id=c.id) }}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 mb-1">{{ c.code }} — {{ c.title }}</h2>
+                    <p class="text-muted small mb-0">{{ c.term }}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">You're not enrolled in any courses yet.</div>
+{% endif %}
 {% endblock %}

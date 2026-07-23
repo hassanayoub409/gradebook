@@ -1,20 +1,36 @@
 {% extends "base.html" %}
 {% block title %}{{ "Edit" if course else "New" }} course — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>{{ "Edit" if course else "New" }} course</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>{{ form.code.label }} {{ form.code() }}</p>
-        <p>{{ form.title.label }} {{ form.title() }}</p>
-        <p>{{ form.term.label }} {{ form.term() }}</p>
-        <p>{{ form.is_published.label }} {{ form.is_published() }}</p>
-        <button type="submit">Save</button>
-    </form>
-</main>
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4">{{ "Edit" if course else "New" }} course</h1>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.code.label(class="form-label") }}
+                        {{ form.code(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.term.label(class="form-label") }}
+                        {{ form.term(class="form-control") }}
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ form.is_published(class="form-check-input") }}
+                        {{ form.is_published.label(class="form-check-label") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    {% if course %}
+                        <a href="{{ url_for('courses.course_detail', course_id=course.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,101 +1,108 @@
 {% extends "base.html" %}
 {% block title %}{{ course.code }} — Gradebook{% endblock %}
 {% block content %}
-<main>
-    <h1>{{ course.code }} — {{ course.title }}</h1>
-    <p>{{ course.term }} {{ "(unpublished)" if not course.is_published else "" }}</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-
-    {% set is_course_staff = current_user.is_staff and course.has_staff(current_user) %}
-
-    {% if is_course_staff %}
-        <p>
-            <a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit course</a>
-            &nbsp;|&nbsp;
-            <a href="{{ url_for('courses.new_section', course_id=course.id) }}">+ Add section</a>
-            &nbsp;|&nbsp;
-            <a href="{{ url_for('courses.enroll_students', course_id=course.id) }}">Enroll students</a>
-            &nbsp;|&nbsp;
-            <a href="{{ url_for('exports.export_roster', course_id=course.id) }}">Export roster (Excel)</a>
-            &nbsp;|&nbsp;
-            <a href="{{ url_for('courses.manage_staff', course_id=course.id) }}">Manage staff</a>
+<div class="d-flex justify-content-between align-items-start mb-2">
+    <div>
+        <h1 class="h4 mb-1">{{ course.code }} — {{ course.title }}</h1>
+        <p class="text-muted mb-0">
+            {{ course.term }}
+            {% if not course.is_published %}<span class="badge text-bg-warning ms-2">Unpublished</span>{% endif %}
         </p>
-        {% set total_weight = course.sections | sum(attribute="weight") %}
-        <p><small>Total section weight: {{ total_weight }}%{% if total_weight != 100 %} (doesn't add up to 100% yet){% endif %}</small></p>
-    {% elif student_view_data and student_view_data.overall %}
-        <p><strong>Your grade: {{ "%.1f"|format(student_view_data.overall.current_percentage) }}%</strong>
-        <small>(assuming zero on anything not yet graded)</small></p>
-        <p><a href="{{ url_for('exports.export_course', course_id=course.id) }}">Export my results (Excel)</a></p>
-    {% elif student_view_data %}
-        <p><small>No sections have been set up yet.</small></p>
-    {% endif %}
+    </div>
+</div>
 
-    {% for section in course.sections %}
-    <section style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-        <h2>{{ section.name }} — {{ section.weight }}%</h2>
+{% set is_course_staff = current_user.is_staff and course.has_staff(current_user) %}
 
-        {% if student_view_data %}
-            {% set summary = student_view_data.section_summaries.get(section.id) %}
-            {% if summary %}
-                <p><small>Section score: {{ summary.obtained }} / {{ summary.possible }} ({{ "%.1f"|format(summary.percentage) }}%)</small></p>
-            {% else %}
-                <p><small>Nothing graded in this section yet.</small></p>
+{% if is_course_staff %}
+    <div class="d-flex flex-wrap gap-2 my-3">
+        <a href="{{ url_for('courses.edit_course', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm">Edit course</a>
+        <a href="{{ url_for('courses.new_section', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm">+ Add section</a>
+        <a href="{{ url_for('courses.enroll_students', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm">Enroll students</a>
+        <a href="{{ url_for('courses.manage_staff', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm">Manage staff</a>
+        <a href="{{ url_for('exports.export_roster', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm">Export roster (Excel)</a>
+    </div>
+    {% set total_weight = course.sections | sum(attribute="weight") %}
+    <p class="small text-muted">
+        Total section weight: {{ total_weight }}%
+        {% if total_weight != 100 %}<span class="text-warning">(doesn't add up to 100% yet)</span>{% endif %}
+    </p>
+{% elif student_view_data and student_view_data.overall %}
+    <div class="d-flex align-items-center gap-3 my-3">
+        <span class="fs-4 fw-bold">{{ "%.1f"|format(student_view_data.overall.current_percentage) }}%</span>
+        <span class="text-muted small">assuming zero on anything not yet graded</span>
+        <a href="{{ url_for('exports.export_course', course_id=course.id) }}" class="btn btn-outline-primary btn-sm ms-auto">Export my results (Excel)</a>
+    </div>
+{% elif student_view_data %}
+    <p class="text-muted my-3">No sections have been set up yet.</p>
+{% endif %}
+
+{% for section in course.sections %}
+<div class="card mb-3 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <strong>{{ section.name }}</strong> <span class="text-muted">— {{ section.weight }}%</span>
+            {% if student_view_data %}
+                {% set summary = student_view_data.section_summaries.get(section.id) %}
+                {% if summary %}
+                    <span class="badge text-bg-light border ms-2">{{ summary.obtained }} / {{ summary.possible }} ({{ "%.1f"|format(summary.percentage) }}%)</span>
+                {% else %}
+                    <span class="badge text-bg-light border ms-2">Not graded yet</span>
+                {% endif %}
             {% endif %}
-        {% endif %}
-
+        </div>
         {% if is_course_staff %}
-            <p>
-                <a href="{{ url_for('courses.edit_section', course_id=course.id, section_id=section.id) }}">Edit</a>
-                &nbsp;
-                <form method="POST" action="{{ url_for('courses.delete_section', course_id=course.id, section_id=section.id) }}" style="display:inline;" onsubmit="return confirm('Delete this section and all its activities?');">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit">Delete</button>
-                </form>
-                &nbsp;
-                <a href="{{ url_for('courses.new_activity', course_id=course.id, section_id=section.id) }}">+ Add activity</a>
-            </p>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('courses.edit_section', course_id=course.id, section_id=section.id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+            <form method="POST" action="{{ url_for('courses.delete_section', course_id=course.id, section_id=section.id) }}" onsubmit="return confirm('Delete this section and all its activities?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+            </form>
+            <a href="{{ url_for('courses.new_activity', course_id=course.id, section_id=section.id) }}" class="btn btn-primary btn-sm">+ Add activity</a>
+        </div>
         {% endif %}
+    </div>
 
-        <table border="1" cellpadding="6">
-            <tr>
-                <th>Activity</th><th>Type</th><th>Total marks</th>
-                {% if student_view_data %}<th>Your marks</th>{% endif %}
-                {% if is_course_staff %}<th>Actions</th>{% endif %}
-            </tr>
-            {% for activity in section.activities %}
-            <tr>
-                <td>{{ activity.name }}</td>
-                <td>{{ activity.activity_type.value }}</td>
-                <td>{{ activity.total_marks }}</td>
-                {% if student_view_data %}
-                    {% set mark = student_view_data.activity_marks.get(activity.id) %}
-                    <td>{{ mark.obtained_marks if mark else "Not graded yet" }}</td>
-                {% endif %}
-                {% if is_course_staff %}
-                <td>
-                    <a href="{{ url_for('courses.edit_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}">Edit</a>
-                    &nbsp;
-                    <form method="POST" action="{{ url_for('courses.delete_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}" style="display:inline;" onsubmit="return confirm('Delete this activity?');">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit">Delete</button>
-                    </form>
-                    &nbsp;
-                    <a href="{{ url_for('courses.enter_marks', course_id=course.id, activity_id=activity.id) }}">Enter marks</a>
-                </td>
-                {% endif %}
-            </tr>
-            {% else %}
-            <tr><td colspan="6">No activities in this section yet.</td></tr>
-            {% endfor %}
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Activity</th>
+                    <th>Type</th>
+                    <th>Total marks</th>
+                    {% if student_view_data %}<th>Your marks</th>{% endif %}
+                    {% if is_course_staff %}<th class="text-end">Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in section.activities %}
+                <tr>
+                    <td>{{ activity.name }}</td>
+                    <td><span class="badge text-bg-secondary">{{ activity.activity_type.value }}</span></td>
+                    <td>{{ activity.total_marks }}</td>
+                    {% if student_view_data %}
+                        {% set mark = student_view_data.activity_marks.get(activity.id) %}
+                        <td>{{ mark.obtained_marks if mark else "Not graded yet" }}</td>
+                    {% endif %}
+                    {% if is_course_staff %}
+                    <td class="text-end">
+                        <a href="{{ url_for('courses.edit_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        <a href="{{ url_for('courses.enter_marks', course_id=course.id, activity_id=activity.id) }}" class="btn btn-outline-primary btn-sm">Enter marks</a>
+                        <form method="POST" action="{{ url_for('courses.delete_activity', course_id=course.id, section_id=section.id, activity_id=activity.id) }}" class="d-inline" onsubmit="return confirm('Delete this activity?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-muted">No activities in this section yet.</td></tr>
+                {% endfor %}
+            </tbody>
         </table>
-    </section>
-    {% else %}
-    <p>No sections yet.</p>
-    {% endfor %}
-</main>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">No sections yet.</div>
+{% endfor %}
 {% endblock %}
