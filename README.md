@@ -212,6 +212,7 @@ gradebook/
 
 ## License
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+
 This project is for educational and personal use. 
 
 **This project was vibe-coded with Claude.**
