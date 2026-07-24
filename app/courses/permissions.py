@@ -42,7 +42,10 @@ def course_staff_required(f):
 
 
 def enrolled_or_staff_required(f):
-    """Student must be enrolled; staff must be assigned to the course. Used for viewing course detail."""
+    """Staff assigned to the course can always view it, published or not.
+    Students must be enrolled AND the course must be published — an
+    unpublished course is invisible to students even if they're enrolled,
+    since is_published is a draft/staging gate, not just a listing filter."""
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_approved:
@@ -52,7 +55,7 @@ def enrolled_or_staff_required(f):
             if not course.has_staff(current_user):
                 abort(403)
         elif current_user.role.value == "student":
-            if not course.has_student(current_user):
+            if not course.has_student(current_user) or not course.is_published:
                 abort(403)
         else:
             abort(403)

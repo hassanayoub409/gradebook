@@ -7,6 +7,8 @@
 import os
 from dotenv import load_dotenv
 
+from sqlalchemy.pool import StaticPool
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(os.path.dirname(basedir), ".env"))
 
@@ -36,6 +38,10 @@ class ProdConfig(Config):
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "connect_args": {"check_same_thread": False},
+        "poolclass": StaticPool,
+    }
     WTF_CSRF_ENABLED = False
 
 
