@@ -215,4 +215,4 @@ gradebook/
 
 This project is for educational and personal use. 
 
-**This project was vibe-coded with Claude.**
+**This project was vibe-coded with Claude. Any conceptual creativity remain that of author.**
