@@ -5,7 +5,7 @@ and view quiz/assignment/midterm/final marks.
 
 ## Status
 
-Under active development. Currently at: **Stage 10 — polish pass (Bootstrap styling, seed script) complete**.
+Under active development. Currently at: **Stage 11 — automated test suite**.
 
 ## Tech Stack
 
@@ -118,5 +118,5 @@ See `app/` — application factory in `app/__init__.py`, blueprints per feature 
 - [x] Excel export
 - [x] CSV mark import
 - [x] Google OAuth login
-- [ ] Tests (auth, permissions, exports)
+- [x] Tests (auth, permissions, exports)
 - [ ] Deployment
