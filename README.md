@@ -30,6 +30,25 @@ and view quiz/assignment/midterm/final marks.
 
 ---
 
+## Screenshots
+
+**Landing Page**
+![Landing Page](https://github.com/hassanayoub409/gradebook/blob/21b62a4b827e500ea6c5f9f9c1b7650673d5ac70/landing_page.png)
+
+**Login Page**
+![Login Page](https://github.com/hassanayoub409/gradebook/blob/21b62a4b827e500ea6c5f9f9c1b7650673d5ac70/login_page.png)
+
+**Admin's View**
+![Admin's View](https://github.com/hassanayoub409/gradebook/blob/21b62a4b827e500ea6c5f9f9c1b7650673d5ac70/admin_view.png)
+
+**Instructor's View**
+![Instructor's View](https://github.com/hassanayoub409/gradebook/blob/21b62a4b827e500ea6c5f9f9c1b7650673d5ac70/instructor_view.png)
+
+**Student's View**
+![Student's View](https://github.com/hassanayoub409/gradebook/blob/21b62a4b827e500ea6c5f9f9c1b7650673d5ac70/student_view.png)
+
+---
+
 ## Roles
 
 | Role | Capabilities |
@@ -215,4 +234,4 @@ gradebook/
 
 This project is for educational and personal use. 
 
-**This project was vibe-coded with Claude. Any conceptual creativity remain that of author.**
+**This project was vibe-coded with Claude. Any conceptual creativity remains that of author.**
